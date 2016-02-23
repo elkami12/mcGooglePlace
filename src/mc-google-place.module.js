@@ -1,6 +1,5 @@
 (function() {
     'use strict';
 
-    angular
-        .module('mcGooglePlace');
+    angular.module('mcGooglePlace', []);
 })();

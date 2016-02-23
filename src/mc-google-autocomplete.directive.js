@@ -1,39 +1,63 @@
 (function() {
     'use strict';
 
-    angular
-        .module('mcGooglePlace')
+    var googlePlaceModule =
+        angular
+        .module('mcGooglePlace');
+
+
+    googlePlaceModule.config(inputProviderFn);
+
+    inputProviderFn.$inject = ['$provide'];
+    /* @ngInject */
+    function inputProviderFn($provide) {
+        $provide.decorator('inputDirective', inputDirectiveDecorator);
+    }
+
+
+    inputDirectiveDecorator.$inject = ['$delegate'];
+    /* @ngInject */
+    function inputDirectiveDecorator($delegate) {
+
+        var directive = $delegate[0];
+        var originalLinkPre = directive.link.pre;
+
+        directive.link.pre = function(scope, element, attr, ctrls) {
+            if (!ctrls[0] || angular.isUndefined(attr.mcGoogleAutocomplete)) {
+                return originalLinkPre.apply(this, arguments);
+            }
+        };
+
+        return $delegate;
+    }
+
+    googlePlaceModule
         .directive('mcGoogleAutocomplete', mcGoogleAutocomplete);
 
-    mcGoogleAutocomplete.$inject = ['google', '$sniffer', '$browser'];
+    mcGoogleAutocomplete.$inject = ['mcGooglePlaceUtils', '$sniffer', '$browser'];
 
     /* @ngInject */
-    function mcGoogleAutocomplete(google, $sniffer, $browser) {
+    function mcGoogleAutocomplete(mcGooglePlaceUtils, $sniffer, $browser) {
         // Usage:
         //
-        //	<form>
-        //	 	<input	 mc-google-autocomplete
-        //	 	         ng-model="address"
-        //	 	         name="address"
-        //	 	         type="text">
-        // 	</form>
+        //  <form>
+        //      <input   mc-google-autocomplete
+        //               ng-model="address"
+        //               name="address"
+        //               type="text">
+        //  </form>
         //
         // Creates:
         //
         var directive = {
             require: ['?ngModel'],
-            priority: 0.1,
-            terminal: true,
-            // bindToController: true,
-            // controller: AutoCompleteCtrl,
-            // controllerAs: 'vm',
             link: {
                 pre: function(scope, element, attr, ctrls) {
                     if (ctrls[0]) {
-                        linkPre(scope, element, attr, ctrls[0], google, $sniffer, $browser);
+                        linkSubInput(scope, element, ctrls[0], mcGooglePlaceUtils, $sniffer, $browser);
                     }
                 }
-            }
+            },
             restrict: 'A',
             scope: {
                 gaOptions: '=?'
@@ -41,23 +65,24 @@
         };
         return directive;
 
-
-
-        function linkPre(scope, element, attr, ctrl, google, $sniffer, $browser) {
+        function linkSubInput(scope, element, ctrl, mcGooglePlaceUtils, $sniffer, $browser) {
 
             // ************************************************
             // Init the google autocomplete
             // ************************************************
             // google.maps.places.Autocomplete instance (support google.maps.places.AutocompleteOptions)
-            var autocompleteOptions = scope.gaOptions || {},
-                autocomplete = new google.maps.places.Autocomplete(element[0], autocompleteOptions);
+            var autocompleteOptions = scope.gaOptions || {};
 
-
-            // ************************************************
-            // updates view value (which is a cop of the google place object) on place_changed google api event
-            // ************************************************
-            google.maps.event.addListener(autocomplete, 'place_changed', function() {
-                ctrl.$setViewValue(angular.copy(autocomplete.getPlace()));
+            mcGooglePlaceUtils.autocomplete(element[0], autocompleteOptions, function(autocomplete) {
+                var place = autocomplete.getPlace();
+                if (placeToString(place) !== '') {
+                    ctrl.$setViewValue(angular.copy(place));
+                } else {
+                    ctrl.$setViewValue(undefined);
+                }
+                scope.$apply(function() {
+                    ctrl.$commitViewValue();
+                });
             });
 
             // ************************************************
@@ -81,6 +106,7 @@
             }
 
             var listener = function(ev) {
+
                 if (timeout) {
                     $browser.defer.cancel(timeout);
                     timeout = null;
@@ -89,13 +115,17 @@
                 var rawValue = element.val(),
                     event = ev && ev.type;
 
-                rawValue = trim(value);
+                rawValue = rawValue.trim();
 
                 // If a control is suffering from bad input (due to native validators), browsers discard its
                 // value, so it may be necessary to revalidate (by calling $setViewValue again) even if the
                 // control's value is the same empty value twice in a row.
                 if (placeToString(ctrl.$viewValue) !== rawValue || (rawValue === '' && ctrl.$$hasNativeValidators)) {
-                    ctrl.$setViewValue({ name: rawValue }, event);
+                    if (rawValue !== '') {
+                        ctrl.$setViewValue({ name: rawValue }, event);
+                    } else {
+                        ctrl.$setViewValue(undefined, event);
+                    }
                 }
             };
 
@@ -142,15 +172,14 @@
             // define this input render method
             // ************************************************
             ctrl.$render = function() {
-                // Workaround for Firefox validation #12102.
-                var value = ctrl.$isEmpty(ctrl.$viewValue) ? '' : placeToString(ctrl.$viewValue);
+                var value = placeToString(ctrl.$viewValue);
                 if (element.val() !== value) {
                     element.val(value);
                 }
             };
 
             function placeToString(place) {
-                return place.formatted_address || place.name;
+                return angular.isObject(place) ? place.formatted_address || place.name : '';
             }
 
 
@@ -158,7 +187,7 @@
             // redefine this input isEmpty method
             // ************************************************
             ctrl.$isEmpty = function(value) {
-                return angular.isUndefined(value) || value === null || (angular.isObject(value) && placeToString(value) === '') || value !== value;
+                return angular.isUndefined(value) || value === null || angular.isUndefined(value.place_id) || value.place_id === null;
             };
         }
 

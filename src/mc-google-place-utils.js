@@ -2,13 +2,29 @@
     'use strict';
 
     angular
-        .module('mcGoogleAutocomplete')
+        .module('mcGooglePlace')
         .factory('mcGooglePlaceUtils', factory);
 
-    // factory.$inject = [];
+    factory.$inject = ['$window', '$q'];
 
     /* @ngInject */
-    function factory() {
+    function factory($window, $q) {
+
+        var deferred = $q.defer(),
+            promise = deferred.promise,
+            gMapsApi;
+
+        $window.mcGooglePlacesApiLoaded = function() {
+            gMapsApi = $window.google.maps;
+
+            deferred.resolve(gMapsApi);
+        };
+
+        // Check if gmaps.places is not defined already.
+        if (angular.isDefined($window.google) && angular.isDefined($window.google.maps) && angular.isDefined($window.google.maps.places)) {
+            $window.mcGooglePlacesApiLoaded();
+        }
+
         var service = {
             isGooglePlace: isGooglePlace,
             isContainTypes: isContainTypes,
@@ -22,11 +38,31 @@
             getLatitude: getLatitude,
             getLongitude: getLongitude,
             getPostCode: getPostCode,
-            getDistrict: getDistrict
+            getDistrict: getDistrict,
+            autocomplete: autocomplete
         };
         return service;
 
         ////////////////
+
+        function autocomplete(inputElement, autocompleteOptions, placeChangedCb) {
+
+            return getPlacesApi().then(function(mapsApi) {
+                var autocomplete = new mapsApi.places.Autocomplete(inputElement, autocompleteOptions);
+                mapsApi.event.addListener(autocomplete, 'place_changed', function() {
+                    placeChangedCb(autocomplete);
+                });
+                return autocomplete;
+            });
+        }
+
+        function getPlacesApi() {
+            if (!!gMapsApi) {
+                return $q.when(gMapsApi);
+            }
+
+            return promise;
+        }
 
         function isGooglePlace(place) {
             if (!place)
