@@ -1,0 +1,49 @@
+{
+    "name": "mcGooglePlace",
+    "version": "0.1.0",
+    "homepage": "https://github.com/elkami12/mcGooglePlace",
+    "authors": [
+        "M. Couesnon"
+    ],
+    "description": "Angularjs module dealing with Google Maps autocomplete and places library",
+    "main": [
+        "src/mc-google-autocomplete.directive.js",
+        "src/mc-google-place-utils.js",
+        "src/mc-google-place.module.js"
+    ],
+    "keywords": [
+        "angular",
+        "angularjs",
+        "directive",
+        "autocomplete",
+        "map",
+        "maps",
+        "address",
+        "place",
+        "places",
+        "api",
+        "google"
+    ],
+    "license": "MIT",
+    "ignore": [
+        "**/.*",
+        "node_modules",
+        "bower_components",
+        ".bowerrc",
+        ".gitignore",
+        "package.json",
+        "Gruntfile.js",
+        "karma.conf.js",
+        "CHANGELOG.md",
+        "src",
+        "test",
+        "tests"
+    ],
+    "dependencies": {
+        "angular": "^1.3.18"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git://github.com/elkami12/mcGooglePlace.git"
+    }
+}
