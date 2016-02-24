@@ -1,3 +1,4 @@
+/* jshint ignore:start */
 (function() {
     'use strict';
 
@@ -35,3 +36,4 @@
         return UUID;
     }
 })();
+/* jshint ignore:end */

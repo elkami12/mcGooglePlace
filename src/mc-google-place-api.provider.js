@@ -3,10 +3,9 @@
 
     angular
         .module('mcGooglePlace')
-        .provider('mcGooglePlaceApi', mcGooglePlaceApiProvider);
+        .provider('mcGooglePlaceApi', McGooglePlaceApiProvider);
 
-    function mcGooglePlaceApiProvider() {
-
+    function McGooglePlaceApiProvider() {
         var config = {
             transport: 'https',
             isGoogleMapsForWork: false,

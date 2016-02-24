@@ -46,8 +46,9 @@
 
         function getAddrComponent(place, componentTemplate) {
             var result;
-            if (!isValidGooglePlace(place))
+            if (!isValidGooglePlace(place)) {
                 return;
+            }
             for (var i = 0; i < place.address_components.length; i++) {
                 var addressType = place.address_components[i].types[0];
                 if (componentTemplate[addressType]) {

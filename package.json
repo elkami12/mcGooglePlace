@@ -1,0 +1,35 @@
+{
+  "name": "mc-google-place",
+  "version": "0.1.0",
+  "description": "Angularjs module dealing with Google Maps autocomplete and places library",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/elkami12/mcGooglePlace.git"
+  },
+  "author": "M. Couesnon",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/elkami12/mcGooglePlace/issues"
+  },
+  "homepage": "https://github.com/elkami12/mcGooglePlace#readme",
+  "devDependencies": {
+    "gulp": "^3.9.1",
+    "gulp-concat": "^2.6.0",
+    "gulp-header": "^1.7.1",
+    "gulp-if": "^2.0.0",
+    "gulp-jscs": "^3.0.2",
+    "gulp-jshint": "^2.0.0",
+    "gulp-load-plugins": "^1.2.0",
+    "gulp-print": "^2.0.1",
+    "gulp-rename": "^1.2.2",
+    "gulp-sourcemaps": "^1.6.0",
+    "gulp-uglify": "^1.5.3",
+    "gulp-util": "^3.0.7",
+    "jshint": "^2.9.1",
+    "jshint-stylish": "^2.1.0",
+    "yargs": "^4.1.0"
+  }
+}

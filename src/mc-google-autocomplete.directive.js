@@ -87,6 +87,7 @@
             // ************************************************
             // ******** Track any other input change in order to reset to a default viewValue
             // ************************************************
+            var timeout;
 
             // In composition mode, users are still inputing intermediate text buffer,
             // hold the listener until composition is done.
@@ -104,13 +105,15 @@
                 });
             }
 
-            var listener = function(ev) {
+            function listener(ev) {
 
                 if (timeout) {
                     $browser.defer.cancel(timeout);
                     timeout = null;
                 }
-                if (composing) return;
+                if (composing) {
+                    return;
+                }
                 var rawValue = element.val(),
                     event = ev && ev.type;
 
@@ -126,32 +129,32 @@
                         ctrl.$setViewValue(undefined, event);
                     }
                 }
-            };
+            }
+
+            function deferListener(ev, input, origValue) {
+                if (!timeout) {
+                    timeout = $browser.defer(function() {
+                        timeout = null;
+                        if (!input || input.value !== origValue) {
+                            listener(ev);
+                        }
+                    });
+                }
+            }
 
             // if the browser does support "input" event, we are fine - except on IE9 which doesn't fire the
             // input event on backspace, delete or cut
             if ($sniffer.hasEvent('input')) {
                 element.on('input', listener);
             } else {
-                var timeout;
-
-                var deferListener = function(ev, input, origValue) {
-                    if (!timeout) {
-                        timeout = $browser.defer(function() {
-                            timeout = null;
-                            if (!input || input.value !== origValue) {
-                                listener(ev);
-                            }
-                        });
-                    }
-                };
-
                 element.on('keydown', function(event) {
                     var key = event.keyCode;
 
                     // ignore
                     //    command            modifiers                   arrows
-                    if (key === 91 || (15 < key && key < 19) || (37 <= key && key <= 40)) return;
+                    if (key === 91 || (15 < key && key < 19) || (37 <= key && key <= 40)) {
+                        return;
+                    }
 
                     deferListener(event, this, this.value);
                 });

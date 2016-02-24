@@ -9,15 +9,14 @@
 
     /* @ngInject */
     function mcGooglePlaceScriptLoader($q, uuidGen) {
+        var scriptId = void 0;
+
         var service = {
             load: load
         };
         return service;
 
         ////////////////
-
-        var scriptId = void 0;
-
 
         function getScriptUrl(options) {
             if (options.china) {
@@ -48,7 +47,7 @@
                 scriptElem.parentNode.removeChild(scriptElem);
             }
             var script = document.createElement('script');
-            script.id = scriptId = "ui_gmap_map_load_" + (uuidGen.generate());
+            script.id = scriptId = 'ui_gmap_map_load_' + (uuidGen.generate());
             script.type = 'text/javascript';
             script.src = getScriptUrl(options) + query;
             return document.body.appendChild(script);

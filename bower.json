@@ -7,9 +7,7 @@
     ],
     "description": "Angularjs module dealing with Google Maps autocomplete and places library",
     "main": [
-        "src/mc-google-autocomplete.directive.js",
-        "src/mc-google-place-utils.js",
-        "src/mc-google-place.module.js"
+        "dist/mc-google-place.js"
     ],
     "keywords": [
         "angular",
@@ -24,7 +22,7 @@
         "api",
         "google"
     ],
-    "license": "MIT",
+    "license": "Apache-2.0",
     "ignore": [
         "**/.*",
         "node_modules",
