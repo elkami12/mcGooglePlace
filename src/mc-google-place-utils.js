@@ -12,6 +12,7 @@
 
         var service = {
             isValidGooglePlace: isValidGooglePlace,
+            containType: containType,
             getStreetNumber: getStreetNumber,
             getStreet: getStreet,
             getCity: getCity,
@@ -44,6 +45,20 @@
             return angular.isObject(place) && !!place.place_id;
         }
 
+        function containType(place, type) {
+            if (!isValidGooglePlace(place)) {
+                return false;
+            }
+
+            var placeTypes = place.types;
+            for (var i = placeTypes.length - 1; i >= 0; i--) {
+                if (placeTypes[i] === type) {
+                    return true;
+                }
+            }
+
+            return false;
+        }
 
         function getAddrComponent(place, componentTemplate) {
             var result;
