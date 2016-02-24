@@ -5,13 +5,16 @@ var $ = require('gulp-load-plugins')({
     lazy: true
 });
 var input = {
-        'javascript': 'src/**/*.js'
+        'javascript': [
+            'src/**/*.module.js',
+            'src/**/*.js'
+        ]
     },
 
     output = {
         'dest': 'dist/',
         'file': 'mc-google-place.js',
-        'min' : 'mc-google-place.min.js'
+        'min': 'mc-google-place.min.js'
     };
 
 /* run the watch task when gulp is called without arguments */
