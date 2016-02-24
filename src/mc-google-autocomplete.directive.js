@@ -73,8 +73,7 @@
             // google.maps.places.Autocomplete instance (support google.maps.places.AutocompleteOptions)
             var autocompleteOptions = scope.gaOptions || {};
 
-            mcGooglePlaceUtils.autocomplete(element[0], autocompleteOptions, function(autocomplete) {
-                var place = autocomplete.getPlace();
+            mcGooglePlaceUtils.buildAutocomplete(element[0], autocompleteOptions, function(place) {
                 if (placeToString(place) !== '') {
                     ctrl.$setViewValue(angular.copy(place));
                 } else {
@@ -187,7 +186,7 @@
             // redefine this input isEmpty method
             // ************************************************
             ctrl.$isEmpty = function(value) {
-                return angular.isUndefined(value) || value === null || angular.isUndefined(value.place_id) || value.place_id === null;
+                return !mcGooglePlaceUtils.isValidGooglePlace(value);
             };
         }
 

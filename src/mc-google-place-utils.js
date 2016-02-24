@@ -5,30 +5,13 @@
         .module('mcGooglePlace')
         .factory('mcGooglePlaceUtils', factory);
 
-    factory.$inject = ['$window', '$q'];
+    factory.$inject = ['mcGooglePlaceApi'];
 
     /* @ngInject */
-    function factory($window, $q) {
-
-        var deferred = $q.defer(),
-            promise = deferred.promise,
-            gMapsApi;
-
-        $window.mcGooglePlacesApiLoaded = function() {
-            gMapsApi = $window.google.maps;
-
-            deferred.resolve(gMapsApi);
-        };
-
-        // Check if gmaps.places is not defined already.
-        if (angular.isDefined($window.google) && angular.isDefined($window.google.maps) && angular.isDefined($window.google.maps.places)) {
-            $window.mcGooglePlacesApiLoaded();
-        }
+    function factory(mcGooglePlaceApi) {
 
         var service = {
-            isGooglePlace: isGooglePlace,
-            isContainTypes: isContainTypes,
-            getPlaceId: getPlaceId,
+            isValidGooglePlace: isValidGooglePlace,
             getStreetNumber: getStreetNumber,
             getStreet: getStreet,
             getCity: getCity,
@@ -39,59 +22,31 @@
             getLongitude: getLongitude,
             getPostCode: getPostCode,
             getDistrict: getDistrict,
-            autocomplete: autocomplete
+            buildAutocomplete: buildAutocomplete
         };
         return service;
 
         ////////////////
 
-        function autocomplete(inputElement, autocompleteOptions, placeChangedCb) {
+        function buildAutocomplete(inputElement, autocompleteOptions, placeChangedCb) {
 
-            return getPlacesApi().then(function(mapsApi) {
+            return mcGooglePlaceApi.then(function(mapsApi) {
                 var autocomplete = new mapsApi.places.Autocomplete(inputElement, autocompleteOptions);
                 mapsApi.event.addListener(autocomplete, 'place_changed', function() {
-                    placeChangedCb(autocomplete);
+                    placeChangedCb(autocomplete.getPlace());
                 });
                 return autocomplete;
             });
         }
 
-        function getPlacesApi() {
-            if (!!gMapsApi) {
-                return $q.when(gMapsApi);
-            }
-
-            return promise;
+        function isValidGooglePlace(place) {
+            return angular.isObject(place) && !!place.place_id;
         }
 
-        function isGooglePlace(place) {
-            if (!place)
-                return false;
-            return !!place.place_id;
-        }
-
-        function isContainTypes(place, types) {
-            var placeTypes,
-                placeType,
-                type;
-            if (!isGooglePlace(place))
-                return false;
-            placeTypes = place.types;
-            for (var i = 0; i < types.length; i++) {
-                type = types[i];
-                for (var j = 0; j < placeTypes.length; j++) {
-                    placeType = placeTypes[j];
-                    if (placeType === type) {
-                        return true;
-                    }
-                }
-            }
-            return false;
-        }
 
         function getAddrComponent(place, componentTemplate) {
             var result;
-            if (!isGooglePlace(place))
+            if (!isValidGooglePlace(place))
                 return;
             for (var i = 0; i < place.address_components.length; i++) {
                 var addressType = place.address_components[i].types[0];
@@ -101,12 +56,6 @@
                 }
             }
             return;
-        }
-
-        function getPlaceId(place) {
-            if (!isGooglePlace(place))
-                return;
-            return place.place_id;
         }
 
         function getStreetNumber(place) {
@@ -157,17 +106,21 @@
             return postCode;
         }
 
-        function isGeometryExist(place) {
+        function isWithGeometry(place) {
             return angular.isObject(place) && angular.isObject(place.geometry);
         }
 
         function getLatitude(place) {
-            if (!isGeometryExist(place)) return;
+            if (!isWithGeometry(place)) {
+                return null;
+            }
             return place.geometry.location.lat();
         }
 
         function getLongitude(place) {
-            if (!isGeometryExist(place)) return;
+            if (!isWithGeometry(place)) {
+                return null;
+            }
             return place.geometry.location.lng();
         }
 
