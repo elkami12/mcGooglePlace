@@ -22,6 +22,7 @@
             getLongitude: getLongitude,
             getPostCode: getPostCode,
             getDistrict: getDistrict,
+            getSublocality: getSublocality,
             buildAutocomplete: buildAutocomplete
         };
         return service;
@@ -105,6 +106,12 @@
             var COMPONENT_TEMPLATE = { postal_code: 'long_name' },
                 postCode = getAddrComponent(place, COMPONENT_TEMPLATE);
             return postCode;
+        }
+
+        function getSublocality(place) {
+            var COMPONENT_TEMPLATE = { sublocality: 'long_name' },
+                sublocality = getAddrComponent(place, COMPONENT_TEMPLATE);
+            return sublocality;
         }
 
         function isWithGeometry(place) {
