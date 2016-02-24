@@ -39,7 +39,7 @@ gulp.task('vet', function() {
 });
 
 /* concat javascript files */
-gulp.task('concat', function() {
+gulp.task('concat', ['vet'], function() {
     return gulp.src(input.javascript)
         .pipe($.sourcemaps.init())
         .pipe($.concat(output.file))
