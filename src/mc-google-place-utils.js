@@ -21,6 +21,7 @@
             getCountry: getCountry,
             getLatitude: getLatitude,
             getLongitude: getLongitude,
+            getLatLng: getLatLng,
             getPostCode: getPostCode,
             getDistrict: getDistrict,
             getSublocality: getSublocality,
@@ -147,7 +148,15 @@
             return place.geometry.location.lng();
         }
 
-
+        function getLatLng(place) {
+            if (!isWithGeometry(place)) {
+                return null;
+            }
+            return {
+                lat: place.geometry.location.lat(),
+                lng: place.geometry.location.lng()
+            };
+        }
 
     }
 })();
